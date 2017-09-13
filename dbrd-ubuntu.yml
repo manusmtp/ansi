@@ -1,6 +1,11 @@
 ---
 - hosts: pace
   user: root
+  vars: 
+      node1: alpha
+      node2: beta
+      node1-ip: 192.168.0.221
+      node2-ip: 192.168.0.222
   tasks: 
    - name: installing dbrd utils
      shell: apt-get install -y drbd8-utils
@@ -10,5 +15,15 @@
        number: 1
        state: present
    - name: zeroing the contents of the disk
-     dd if=/dev/zero of=/dev/sdb1 
-    
+     dd if=/dev/zero of=/dev/sdb1
+   - name: copying drbd.conf file to /etc/
+     template: 
+       src: files/drbd.j2 
+       dest: /etc/drbd.conf
+    - name: loading the mod and creating the device
+      command: "{{ item }}"
+      with_items:
+        - modprobe drbd
+        - drbdadm create-md r0
+        - drbdadm up r0
+        - drbdadm -- --overwrite-data-of-peer primary r0/0
