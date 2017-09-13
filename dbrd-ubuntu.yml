@@ -1,0 +1,14 @@
+---
+- hosts: pace
+  user: root
+  tasks: 
+   - name: installing dbrd utils
+     shell: apt-get install -y drbd8-utils
+   - name: parted disk creation
+     parted: 
+       device: /dev/sdb
+       number: 1
+       state: present
+   - name: zeroing the contents of the disk
+     dd if=/dev/zero of=/dev/sdb1 
+    
