@@ -1,0 +1,16 @@
+global { usage-count no; }
+common { protocol C; }
+resource r0 {
+  on {{ node1 }} {
+    device /dev/drbd0;
+    disk /dev/sdb1;
+    address {{ node1-ip }}:7788;
+    meta-disk internal;
+  }
+  on {{ node2 }} {
+    device /dev/drbd0;
+    disk /dev/sdb1;
+    address {{ node2-ip }}:7788;
+    meta-disk internal;
+  }
+}
