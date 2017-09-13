@@ -1,0 +1,33 @@
+totem {
+  version: 2
+  cluster_name: debian
+  secauth: off
+  transport:udpu
+  interface {
+    ringnumber: 0
+    bindnetaddr: {{ gen-ip }}
+    broadcast: yes
+    mcastport: 5405
+  }
+}
+
+nodelist {
+  node {
+    ring0_addr: {{  node1-ip }}
+    name: {{ node1 }}
+    nodeid: 1
+  }
+  node {
+    ring0_addr: {{ node2-ip }}
+    name: {{ node2 }}
+    nodeid: 2
+  }
+}
+
+quorum {
+  provider: corosync_votequorum
+  two_node: 1
+  wait_for_all: 1
+  last_man_standing: 1
+  auto_tie_breaker: 0
+}
