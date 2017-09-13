@@ -20,10 +20,28 @@
      template: 
        src: files/drbd.j2 
        dest: /etc/drbd.conf
-    - name: loading the mod and creating the device
+   - name: loading the mod and creating the device
       command: "{{ item }}"
       with_items:
         - modprobe drbd
         - drbdadm create-md r0
+   
+- hosts: master
+  user: root
+  tasks:
+   - name:
+     command: "{{ item }}"
+     with_items:
         - drbdadm up r0
         - drbdadm -- --overwrite-data-of-peer primary r0/0
+
+
+- hosts: master
+  user: root
+  tasks:
+   - name: 
+     command: " {{ item }} "
+     with_items: 
+      - mkfs.ext4 /dev/drbd0
+      - mkdir -p /var/www/html
+      
