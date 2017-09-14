@@ -39,9 +39,29 @@
 - hosts: master
   user: root
   tasks:
-   - name: 
+   - name: only on one node 
      command: " {{ item }} "
      with_items: 
       - mkfs.ext4 /dev/drbd0
       - mkdir -p /var/www/html
+      - mount /dev/drbd0 /var/www/html
+      - echo "this is generated for the first time when it was mounted" > /var/www/html/index.html
+    
+- hosts: pace
+  user: root
+  tasks:
+   - name: umounting and other
+     command: " {{ item }}"
+     with_items:
+      - systemctl disable drbd
+      - umount /var/www/htmlsudo drbdadm down r0
+   - name: copy the corosync file to both servers
+     template: 
+          src: files/cocrosync.j2 
+          dest: /etc/corosync/corosync.conf
+   - name: restart the coro and pmaker
+     command: " {{  item }} "
+     with_items: 
+      - systemctl restart corosync
+      - systemctl start pacemaker 
       
