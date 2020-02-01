@@ -1,0 +1,65 @@
+- name: monolythic application
+  hosts: workers
+  vars:
+    db_name: employee_db
+    db_user: db_user
+    db_password: Passw0rd
+  tasks:
+  - name: running apt-get update
+    apt:
+      upgrade: true
+      update_cache: true
+  - name: installing the main dependencies
+    apt:  
+      pkg:  
+       - python
+       - python-setuptools
+       - python-dev
+       - build-essential
+       - python-pip
+       - python-mysqldb
+      state: present
+  
+  - name: installing mysql and its dependencies
+    apt:
+      pkg:
+        - mysql-server
+        - mysql-client
+
+  - name: starting the db
+    service:
+      name: mysql
+      state: restarted
+      enabled: yes
+
+  - name: creating the database
+    mysql_db: 
+      name: '{{ db_name }}' 
+      state: present
+      login_unix_socket: /var/run/mysqld/mysqld.sock
+
+  - name: creating the user in db
+    mysql_user:
+      name:  '{{ db_user }}'
+      password: '{{ db_password }}'
+      priv: '*.*:ALL'
+      host: '%'
+      state: present
+
+  - name: installing web components and its dependencies
+    pip:
+      name:
+       - flask
+       - flask-mysql
+       - Flask-Ext
+
+  - name: setup code
+    copy:
+      src: app.py
+      dest: /opt/app.py
+
+  
+  - name: Start web-application
+    shell: FLASK_APP=/opt/app.py nohup flask run --host=0.0.0.0 & 
+
+  

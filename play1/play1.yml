@@ -1,0 +1,5 @@
+- name: welcome to ansible
+  hosts: workers
+  tasks:
+    - name: ping
+      ping:
